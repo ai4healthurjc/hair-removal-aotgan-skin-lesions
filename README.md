@@ -1,17 +1,17 @@
-# hair-removal-skin-lesions
+# hair-removal-aotgan-skin-lesions
 Repository for reproducibility results for the paper 'A data-driven hair removal approach for dermoscopy images through modified U-Net and GAN-based models', which is focused on eliminating hair from dermoscopy images of skin lesions by employing various U-Net architectures for hair segmentation, followed by the application of an optimized GAN model, the Aggregated Contextual-Transformation-GAN, for image inpainting.
 
 ## Installation and setup
 
 To download the source code, you can clone it from the Github repository.
 ```console
-git clone git@github.com:vgomezm/hair-removal-skin-lesions.git
+git clone git@github.com:ai4healthurjc/hair-removal-aotgan-skin-lesions.git
 ```
 
 Before installing libraries, ensuring that a Python virtual environment is activated (using conda o virtualenv). To install Python libraries run: 
 
 ```console
-pip install -r requirements_venv.txt
+pip install -r requirements.txt
 ```
 ## Download dermoscopy images for hair segmentation and hair inpainting from public datasets
 
