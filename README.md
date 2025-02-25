@@ -13,6 +13,13 @@ Before installing libraries, ensuring that a Python virtual environment is activ
 ```console
 pip install -r requirements.txt
 ```
+The hardware specifications for the server used to run the experiments, which are as follows:
+
+- CPU: AMD Epyc 7713, 64 cores, 128 threads, 2.0 GHz
+- RAM: 256 GB DDR4 (8 x 32 GB)
+- GPUs: 3 x Nvidia Quadro RTX 4000 ADA FH (20GB GDDR6)
+- Storage: 1 TB NVMe PCIe 4.0 (System drive), 4 TB NVMe PCIe 4.0 (Data storage)
+
 ## Download dermoscopy images for hair segmentation and hair inpainting from public datasets
 
 Datasets with dermoscopy images are publicly available in the following websites:
