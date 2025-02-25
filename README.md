@@ -1,5 +1,5 @@
 # hair-removal-aotgan-skin-lesions
-Repository for reproducibility results for the paper 'A data-driven hair removal approach for dermoscopy images through modified U-Net and GAN-based models', which is focused on eliminating hair from dermoscopy images of skin lesions by employing various U-Net architectures for hair segmentation, followed by the application of an optimized GAN model, the Aggregated Contextual-Transformation-GAN, for image inpainting.
+Repository for reproducibility results for the paper 'A data-driven approach for digital hair removal in dermoscopy images using encoder-decoder and generative adversarial network-based models', which is focused on eliminating hair from dermoscopy images of skin lesions by employing various U-Net architectures for hair segmentation, followed by the application of an optimized GAN model, the Aggregated Contextual-Transformation-GAN, for image inpainting.
 
 ## Installation and setup
 
