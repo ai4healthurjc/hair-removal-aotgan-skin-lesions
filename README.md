@@ -1,116 +1,142 @@
 # hair-removal-aotgan-skin-lesions
-Repository for reproducibility results for the paper 'A data-driven approach for digital hair removal in dermoscopy images using encoder-decoder and generative adversarial network-based models', which is focused on eliminating hair from dermoscopy images of skin lesions by employing various U-Net architectures for hair segmentation, followed by the application of an optimized GAN model, the Aggregated Contextual-Transformation-GAN, for image inpainting.
+
+Repository for the reproducibility of the results of the paper *"A data-driven approach for digital hair removal in dermoscopy images using encoder-decoder and generative adversarial network-based models"*. The proposed method removes hair from dermoscopy images in two stages: hair segmentation with U-Net-based models (Dense-Net, Att-Net, and Att+Dense-Net) and hair inpainting with an aggregated contextual-transformation generative adversarial network (AOT-GAN), at 512 × 512 pixels.
+
+No images, masks, metadata, or trained models are distributed in this repository. All the datasets must be downloaded from their original sources (see below).
 
 ## Installation and setup
 
-To download the source code, you can clone it from the Github repository.
+Clone the repository:
+
 ```console
-git clone git@github.com:ai4healthurjc/hair-removal-aotgan-skin-lesions.git
+git clone https://github.com/ai4healthurjc/hair-removal-aotgan-skin-lesions.git
+cd hair-removal-aotgan-skin-lesions
 ```
 
-Before installing libraries, ensuring that a Python virtual environment is activated (using conda o virtualenv). To install Python libraries run: 
+Create and activate a Python virtual environment (conda or virtualenv) and install the libraries:
 
 ```console
 pip install -r requirements.txt
 ```
-The hardware specifications for the server used to run the experiments, which are as follows:
 
-- CPU: AMD Epyc 7713, 64 cores, 128 threads, 2.0 GHz
+The experiments were run with Python 3, TensorFlow 2.13.1 and Keras 2.13.1 (segmentation and classification), keras-unet-collection 0.1.13 (U-Net-based architectures), and PyTorch 2.3.1 with torchvision 0.18.1, CUDA 12.1 and cuDNN 8.9.2 (AOT-GAN). The complete list of dependencies and their versions is provided in `requirements.txt`.
+
+Hardware used to run the experiments (a single GPU was used for each experiment):
+
+- CPU: AMD EPYC 7713, 64 cores, 128 threads, 2.0 GHz
 - RAM: 256 GB DDR4 (8 x 32 GB)
-- GPUs: 3 x Nvidia Quadro RTX 4000 ADA FH (20GB GDDR6)
-- Storage: 1 TB NVMe PCIe 4.0 (System drive), 4 TB NVMe PCIe 4.0 (Data storage)
+- GPUs: 3 x NVIDIA RTX 4000 Ada (20 GB GDDR6)
+- Storage: 1 TB NVMe PCIe 4.0 (system drive), 4 TB NVMe PCIe 4.0 (data storage)
 
-## Download dermoscopy images for hair segmentation and hair inpainting from public datasets
+## Datasets
 
-Datasets with dermoscopy images are publicly available in the following websites:
+| Dataset | Use in the paper | Source |
+|---|---|---|
+| CA | Hair segmentation (training and test) | [Mendeley Data](https://data.mendeley.com/datasets/j5ywpd2p27/2) |
+| AGH (Skin_Hair dataset) | Hair inpainting (training and test) and cross-dataset evaluation of segmentation | [SHD](https://skin-hairdataset.github.io/SHD/) |
+| PH2 | External evaluation set with synthetic hair, melanoma classification, and expert assessment | [PH2 database](https://www.fc.up.pt/addi/ph2%20database.html) |
+| Derm7pt | Melanoma classification and expert assessment | [Derm7pt](https://derm.cs.sfu.ca/Welcome.html) |
+| ISIC-2020 | Melanoma classification | [ISIC 2020 Challenge](https://challenge2020.isic-archive.com/) |
 
-1. [Link to CA dataset](https://data.mendeley.com/datasets/j5ywpd2p27/2) (for hair segmentation)
-2. [Link to AGH dataset](https://skin-hairdataset.github.io/SHD/) (for hair inpainting)
+After downloading the datasets, place them in the `data` folder:
 
-## Download dermoscopy images for melanoma classification from public datasets
+- `data/segmentation_hair/raw` (images) and `data/segmentation_hair/masks` (hair masks): CA dataset.
+- `data/inpainting/raw_without_hair` (hair-free images), `data/inpainting/raw_with_hair` (images with hair), and `data/inpainting/masks` (hair masks): AGH dataset.
+- `data/classification/ISIC-2020`, `data/classification/Derm7pt`, and `data/classification/PH2`: images and the metadata file (CSV) provided by each dataset, with the diagnosis of each image (`target` in ISIC-2020, `diagnosis` in Derm7pt, and `Clinical Diagnosis` in PH2, with 1 for melanoma and 0 otherwise). In ISIC-2020, the duplicated images and the images with an unknown diagnosis were discarded, as described in the Supplementary Material of the paper.
 
-Datasets with dermoscopy images are publicly available in the following websites:
+## Data partitions
 
-1. [Link to ISIC20 dataset](https://challenge2020.isic-archive.com/)
-2. [Link to PH2 dataset](https://www.fc.up.pt/addi/ph2%20database.html)
-3. [Link to Derm7pt dataset](https://derm.cs.sfu.ca/Welcome.html)
+All experiments were repeated with five train-validation-test partitions generated with fixed random seeds (0 to 4). Each dataset was split into training (80%) and test (20%) subsets, and 15% of the training subset was used for validation. In the AGH dataset, the split was performed at the level of the original hair-free images, so that all the hair-augmented versions of the same image belong to the same subset. In the classification datasets, the split was stratified by class, and the majority class was randomly undersampled only in the training subset.
 
-To replicate the results, download images from datasets. After downloading data, you have to put images in data folder. Specifically:
+The identifiers of the images in each subset and partition are provided in the folder `partitions`:
 
-- data/segmentation_hair/masks (hair masks), data/segmentation_hair/raw (images). (CA dataset for hair segmentation);
-- data/inpainting/raw_with_hair (images with hair), data/inpainting/raw_without_hair (images without hair), data/inpainting/masks (hair masks). (AGH dataset for hair inpainting);
-- data/classification/ISIC-2020 (metadata and images);
-- data/classification/Derm7pt (metadata and images);
-- data/classification/PH2 (metadata and images);
+- `segmentation_CA_partitions.csv`
+- `inpainting_AGH_partitions.csv`
+- `classification_Derm7pt_partitions.csv`, `classification_ISIC-2020_partitions.csv`, and `classification_PH2_partitions.csv`
+- `ph2_hairfree_ids.txt` (the 21 hair-free PH2 images used to build the external evaluation set)
 
-It is important to note that, for hair inpainting, we divided the dataset into five different train-test sets. This means that when you execute the procedure, you need to be aware that the images without hair and masks folders were updated with different training sets. When testing, we used the different test sets accordingly.
-
-## To obtain different results of data-driven models
-
-To train U-Net-based model for hair segmentation:
-    
-```console
-python src/segmentation_train.py --model=Attention-U-Net --resize=True --img_size=128 --color_space=ycrcb --n_seeds=5 --epochs_early_stopping=55 --epochs_lr_adaptative=25 --batch_size=32 --num_epochs=500
-```
-
-To generate hair masks with U-Net-based models trained:
+These files can be regenerated from the downloaded datasets with:
 
 ```console
-python src/generate_masks_hair.py --model=Attention-U-Net --resize=True --img_size=128 --color_space=ycrcb --seed=0 
+python src/export_partitions.py --experiment all
 ```
-The hair masks are saved in: reports/segmentation/masks.
 
-To train AOT-GAN model for hair inpainting:
+## External PH2 evaluation set with synthetic hair
+
+Since the terms of use of PH2 do not allow its redistribution, the external evaluation set is not distributed. It can be generated exactly (pixel-identical images) from the original PH2 images with `src/make_ph2_external_set.py`, in two steps:
+
+1. Read the 21 hair-free PH2 images listed in `partitions/ph2_hairfree_ids.txt` from the original PH2 folder and resize them to 512 × 512 pixels:
 
 ```console
- python src/AOT_GAN/train.py --image_size=512 --iterations=1e4 --save_every=2e3 --batch_size=8 --dir_image=[path to dermoscopy image without hair (ground truths)] --dir_mask=[path to hair masks]
-```
-The AOT-GAN models are saved in: reports/inpainting/aot_gan/models
-
-By default, the following paths are set:
-```console
---dir_image=data/inpainting/raw_without_hair
---dir_mask=data/inpainting/masks 
+python src/make_ph2_external_set.py prepare [PH2 folder] partitions/ph2_hairfree_ids.txt data/ph2_external_set/ph2_original
 ```
 
-To generate dermoscopy images without hair with AOT-GAN-based model trained:
+2. Add synthetic hair with a procedural hair simulator (3 hair densities × 3 hair colors), which generates the 189 images with hair, their binary hair masks, and a manifest (`manifest.csv`):
 
 ```console
-python src/AOT_GAN/test.py --pre_train=[path to pretrained model] --dir_image_test= [path to dermoscopy images with hair] --dir_mask=[path to hair masks]
-```
-The dermoscopy images without hair are saved in: reports/inpainting/aot_gan
-
-By default, the following paths are set:
-```console
---dir_image_test=data/inpainting/raw_with_hair
---dir_mask=data/inpainting/masks 
+python src/make_ph2_external_set.py synthesize data/ph2_external_set/ph2_original data/ph2_external_set 0
 ```
 
-To evaluate the dermoscopy images without hair by AOT-GAN with real dermoscopy images images without hair (ground truth):
+With seed 0, the script reproduces exactly the set used in the paper (on average, hair covers 3.3%, 4.4%, and 6.6% of the image for low, medium, and high density).
+
+## Hair segmentation
+
+To train the U-Net-based models (`--model` = `Dense-U-Net`, `Attention-U-Net`, or `Attention-Dense-U-Net`; `--color_space` = `rgb` or `ycrcb`) on the five partitions:
 
 ```console
- python src/AOT_GAN/eval.py --real_dir [real dermoscopy images without hair (ground truths)] --fake_dir [inpainting results by AOT-GAN] --metric=ssim [mae fid psnr]
-```
-By default, the following paths are set:
-```console
---real_dir=data/inpainting/raw_without_hair
---fake_dir=reports/inpainting/aot_gan
+python src/segmentation_train.py --model=Attention-U-Net --resize=True --img_size=512 --color_space=ycrcb --n_seeds=5 --epochs_early_stopping=55 --epochs_lr_adaptative=25 --batch_size=16 --num_epochs=250
 ```
 
-To generate dermoscopy images without hair with traditional inpainting methods:
+To generate the hair masks with a trained model:
+
+```console
+python src/generate_masks_hair.py --model=Attention-U-Net --resize=True --img_size=512 --color_space=ycrcb --seed=0
+```
+
+The hair masks are saved in `reports/segmentation/masks`.
+
+## Hair inpainting with AOT-GAN
+
+To train AOT-GAN on one partition (`--train_seed` = 0 to 4):
+
+```console
+python src/AOT_GAN/train.py --image_size=512 --iterations=1e4 --save_every=2e3 --batch_size=8 --train_seed=0 --dir_image=data/inpainting/raw_without_hair --dir_mask=data/inpainting/masks
+```
+
+The loss weights are λ_adv = 0.01, λ_rec = 1, λ_per = 0.1, and λ_style = 250 (default values in `src/AOT_GAN/my_utils/option.py`). The models are saved in `reports/inpainting/aot_gan/models`.
+
+To remove the hair of the test images with a trained model, using the hair masks detected by Att-Net:
+
+```console
+python src/AOT_GAN/test.py --pre_train=[path to the trained model] --dir_image_test=data/inpainting/raw_with_hair --dir_mask=[path to the hair masks]
+```
+
+The hair-free images are saved in `reports/inpainting/aot_gan`.
+
+To evaluate the hair-free images with respect to the ground truth:
+
+```console
+python src/AOT_GAN/eval.py --real_dir=data/inpainting/raw_without_hair --fake_dir=reports/inpainting/aot_gan --metric=ssim
+```
+
+## Traditional hair removal methods
+
+To remove the hair with DullRazor or Line-filtering (`--traditional_method` = `DullRazor` or `Huang`):
 
 ```console
 python src/main_inpainting_traditional_methods.py --traditional_method=DullRazor --resize=True --img_size=512 --color_space=rgb
 ```
-The dermoscopy images without hair are saved in: reports\inpainting\traditional_methods\DullRazor or reports\inpainting\traditional_methods\Huang
 
-By default, it takes the masks located in the path data/inpainting/masks and the images with hair from data/inpainting/raw_with_hair
+The hair-free images are saved in `reports/inpainting/traditional_methods`.
 
-To train CNN-based models for melanoma classification:
+## Melanoma classification
+
+To train the CNN-based classifiers (`--model` = `Resnet`, `mobilenet`, or `vgg`; `--dataset` = `ISIC-2020`, `Derm7pt`, or `PH2`) on the five partitions:
 
 ```console
 python src/classification.py --dataset=ISIC-2020 --model=Resnet --n_seeds=5 --epochs_early_stopping=15 --epochs_lr_adaptative=5 --batch_size=64 --num_epochs=200
 ```
 
+## Citation
 
-
+If you use this code, please cite the paper (citation details will be added upon publication).

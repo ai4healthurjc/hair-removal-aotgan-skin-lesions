@@ -12,7 +12,7 @@ def parse_arguments(parser):
     parser.add_argument('--traditional_method', default='DullRazor', type=str)
     # parser.add_argument('--n_jobs', default=4, type=int)
     parser.add_argument('--resize', default=True, type=bool)
-    parser.add_argument('--img_size', default=128, type=int)
+    parser.add_argument('--img_size', default=512, type=int)
     parser.add_argument('--color_space', default='rgb', type=str)
     parser.add_argument('--num_channel', default=1, type=int)
     return parser.parse_args()

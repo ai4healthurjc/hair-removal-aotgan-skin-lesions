@@ -12,7 +12,7 @@ coloredlogs.install(level='DEBUG', logger=logger)
 def parse_arguments(parser):
     parser.add_argument('--model', default='U-Net', type=str)
     parser.add_argument('--resize', default=True, type=bool)
-    parser.add_argument('--img_size', default=128, type=int)
+    parser.add_argument('--img_size', default=512, type=int)
     # parser.add_argument('--n_jobs', default=4, type=int)
     parser.add_argument('--color_space', default='ycrcb', type=str)
     parser.add_argument('--seed', default=0, type=int)

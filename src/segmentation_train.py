@@ -23,15 +23,15 @@ coloredlogs.install(level='DEBUG', logger=logger)
 def parse_arguments(parser):
     parser.add_argument('--model', default='U-Net', type=str)
     parser.add_argument('--resize', default=True, type=bool)
-    parser.add_argument('--img_size', default=128, type=int)
+    parser.add_argument('--img_size', default=512, type=int)
     # parser.add_argument('--n_jobs', default=4, type=int)
     parser.add_argument('--color_space', default='ycrcb', type=str)
     parser.add_argument('--num_channel', default=1, type=int)
     parser.add_argument('--n_seeds', default=5, type=int)
     parser.add_argument('--epochs_early_stopping', default=55, type=int)
     parser.add_argument('--epochs_lr_adaptative', default=25, type=int)
-    parser.add_argument('--batch_size', default=32, type=int)
-    parser.add_argument('--num_epochs', default=600, type=int)
+    parser.add_argument('--batch_size', default=16, type=int)
+    parser.add_argument('--num_epochs', default=250, type=int)
 
     return parser.parse_args()
 
